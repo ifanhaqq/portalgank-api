@@ -3,6 +3,7 @@ package com.portalgank.portalgank_api.config;
 import com.portalgank.portalgank_api.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -38,7 +39,12 @@ public class SecurityConfig {
         http
                 .csrf((csrf) -> csrf.disable())
                 .authorizeHttpRequests((authorizeHttpRequest) ->
-                        authorizeHttpRequest.requestMatchers("/api/auth/**", "/api/auth/login").permitAll().anyRequest().authenticated())
+                        authorizeHttpRequest.requestMatchers("/api/auth/**", "/api/auth/login").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/article").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/article").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/api/article").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/api/article").hasRole("ADMIN")
+                                .anyRequest().authenticated())
                 .sessionManagement((sessionManagement) ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
